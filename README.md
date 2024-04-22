@@ -1,16 +1,22 @@
 # Automatic LInguistic Unit Count Estimator (ALICE)
 
+new_diarizer
+![Architecture of our model](docs/ALICE.png)
+
+### Introduction
+=======
 NOTE: This branch contains an outdated version of ALICE. Please use the new default branch "new_diarizer" for up-to-date performance. Note that the new branch requires installation from scratch. 
 
 
 INTRODUCTION
 -------------------
+>> master
 
 ALICE is a tool for estimating the number of adult-spoken linguistic units from child-centered audio
 recordings, as captured by microphones worn by children. It is meant as an open-source alternative
 for LENA <tm> adult word count (AWC) estimator [1].
 
-ALICE uses SylNet [[2]](https://github.com/shreyas253/SylNet) for feature extraction and voice-type-classifier [[3]](https://github.com/MarvinLvn/voice-type-classifier) for broad-class speaker
+ALICE uses SylNet [[2]](https://github.com/shreyas253/SylNet) for feature extraction and voice type classifier [[3]](https://github.com/MarvinLvn/voice-type-classifier) for broad-class speaker
 diarization. The used model for linguistic unit counts has been optimized across four languages:
 Argentinian Spanish, Tseltal, Yélî Dnye, and American and UK variants of English. SylNet uses a model that
 has been adapted for daylong child-centered audio, starting from the baseline model available
@@ -24,169 +30,29 @@ but optimized for counting across several minutes of audio. Also note that ALICE
 designed for "typical" high-quality audio recordings, and may
 not operate on such data properly.
 
-![alt text](http://www.cs.tut.fi/sgn/specog/ALICE_schematic2.png)
+### How to use ?
 
+1) [Installation](./docs/installation.md)
+2) [Usage](./docs/usage.md)
+3) [Demo & installation verification](./docs/demo.md)
+4) [Common problems](./docs/debugging.md)   
+5) [Patch notes](./docs/patch_notes.md)
+6) [License](./docs/license.md)
+7) [Related tools](./docs/related_tools.md)
 
-
-CITING
--------------------
+### How to cite ?
 
 If you use ALICE or it's derivatives, please cite the following paper:
 
-Räsänen, O., Seshadri, S. & Casillas, M. (in preparation): *ALICE: An open-source tool
-for automatic linguistic unit count estimation from child-centered daylong recordings*.
-
-
-REQUIREMENTS
--------------------
-
-ALICE has been developed and so-far tested for a range of Linux and macOS environments. Windows users may encounter problems with some package versions, and we are currently looking into this.
-
-Packages:
-
-- Conda (https://docs.conda.io/en/latest/)
-- CMake (```pip install cmake``` or ```conda install cmake```)
-
-(other packages automatically installed by conda environment)
-
-
-LICENSE
--------------------
-Copyright (C) 2020 Okko Räsänen, Tampere University
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-INSTALLATION
--------------------
-- Clone the repository with submodules (`git clone --recurse-submodules https://github.com/orasanen/ALICE/`)
-
-- Make sure you have Conda and Cmake installed.
-
-- Use command line / shell to execute the following steps:
-
-```bash    
-    # Step 1: Set up a conda environment
-
-    # Navigate to ALICE folder:
-
-    $ cd ALICE
-
-    # and run:
-
-    $ conda env create -f ALICE.yml          
-
-    # Step 2: activate the environment
-
-    $ conda activate ALICE  
-
-    # Step 3: install pyannote-audio by running
-
-    $ pip install voice-type-classifier/pyannote/pyannote-audio
-
-    # Done! If you now want to use ALICE, see below. If not, deactivate the environment with
-
-    $ conda deactivate
-
-
+```text
+Räsänen, O., Seshadri, S., Lavechin, M., Cristia, A. & Casillas, M. (in press): ALICE: An open-source tool
+for automatic linguistic unit count estimation from child-centered daylong recordings. Behavior Research Methods. 
+Online open acccess: https://link.springer.com/article/10.3758/s13428-020-01460-x.
 ```
 
+### References
 
-
-USAGE
--------------------
-Always activate the ALICE conda environment before usage. To do this, run:
-```
-  $ conda activate ALICE
-```
-
-
-To process your .wav files containing the audio of interest, run:
-```
-  $ ./run_ALICE.sh <data_location>
-```
-  where <data_location> = folder of .wavs, path to a .wav, or path to a .txt file
-  with a list of .wav paths, one per row.
-
-  For GPU use during diarization , use
-```
-  $ ./run_ALICE.sh <data_location> --gpu
-```
-Note that the use of GPU will speed up diarization substantially, but this will require CUDA toolkit
-and a compatible GPU.
-
-After the processing is complete, results will be written to `ALICE_output.txt` inside ALICE main
-directory. Diarization outputs will be written to `diarization_output.rttm` inside the same directory.
-
-When done, deactivate the environment with
-```
-  $ conda deactivate
-```
-
-
-Notes:
-
-- So far, the system has been tested for audio files up to 5 minutes of duration.
-  For substantially longer files, cutting them into shorter pieces before
-  processing is highly recommended.
-- ALICE will require empty hard disk space equal to approx. the size of the .wavs
-  to be processed.
-
-
-DEMO & INSTALLATION VERIFICATION
--------------------
-
-Navigate to ALICE folder, and run
-```
-  $ conda activate ALICE
-  $ ./run_ALICE.sh demo/ROS_5271_20_01_03600_snippet_mono.wav
-```
-
-After a while, ALICE should complete without errors and print
-``
-SylNet completed
-ALICE completed. Results written to <yourpath>/ALICE/ALICE_output.txt and <yourpath>/ALICE/diarization_output.rttm.
-``
-
-Now, contents of the ``<yourpath>/ALICE/ALICE_output.txt`` should look like this:
-
-------
-
-FileID   phonemes        syllables       words
-
-ROS_5271_20_01_03600_snippet_mono       75      34      28
-
-------
-
-If this is the case, your installation of ALICE works correctly!
-
-DEBUGGING
--------------------
-
-If you are encountering problems with SylNet, please refer to sylnet.log that is automatically
-generated to ALICE main folder upon ALICE execution. SylNet error printing to command line is disabled
-due to a large number of warnings due to the use of Tensorflow 1.
-
-## Some common problems:
-
-### Error #1
-Traceback (most recent call last):
-  File "<yourpath>/ALICE/SylNet/run_SylNet.py", line 99, in <module>
-    y = y/max(abs(y))
-ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
-
-### Solution #1
-
-The input speech signal is likely to be stereo. Convert to mono before processing.   
-
-
-REFERENCES
--------------------
-
+```text
 [1] Xu, D., Yapanel, U. Gray, S., Gilkerson, J., Richards, J. Hansen, J. (2008).
     Signal processing for young child speech language development
     Proceedings of the 1st Workshop on Child Computer and Interaction (WOCCI-2008), Chania, Crete, Greece.
@@ -196,3 +62,4 @@ REFERENCES
     IEEE Signal Processing Letters, vol 26, pp. 1359--1363  (https://github.com/shreyas253/SylNet)
 
 [3] Lavechin, M.: Voice-type-classifier (https://github.com/MarvinLvn/voice-type-classifier)
+```

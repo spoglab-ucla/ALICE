@@ -5,6 +5,7 @@
 import csv,sys
 from scipy.io import wavfile
 import numpy as np
+import librosa
 
 curdir = sys.argv[1]
 
@@ -29,11 +30,14 @@ for k in range(0,len(DATA)):
         if(ref == speaker):
             isvalid = True
     if(curfile != orig_filename): # read .wav if not read already
-        fs, data = wavfile.read(orig_filename)
+        try:
+            fs, data = wavfile.read(orig_filename)
+        except ValueError: # Reading failed. Try with librosa.
+            data, fs = librosa.load(orig_filename,16000)
         curfile = orig_filename
     onset = float(s[3])
     offset = onset+float(s[4])
     if isvalid:
         y = data[max(0,round(onset*fs)):min(len(data),round(offset*fs))]
-        new_filename = curdir + '/tmp_data/short/'+ filename + ("_%08.0f" % (onset*10000)) + '_' + ("%08.0f" % (offset*10000)) +'.wav'
+        new_filename = curdir + '/tmp_data/short/'+ filename + ("_%010.0f" % (onset*10000)) + '_' + ("%010.0f" % (offset*10000)) +'.wav'
         wavfile.write(new_filename,fs,y)

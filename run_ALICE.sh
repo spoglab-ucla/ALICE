@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 THISDIR="$( cd "$( dirname "$0" )" && pwd )"
 
-# Run with --gpu if CUDA GPU is available
+# Run with extra argument "gpu" if CUDA GPU is available
 
 
 if [ $# -eq 0 ]; then
     echo "Too few arguments. Usage:
-    sh run_ALICE.sh <data_location>
+    ./run_ALICE.sh <data_location>
     or
-    sh run_ALICE.sh <data_location> --gpu (for GPU-supported environments)
+    ./run_ALICE.sh <data_location> gpu (for GPU-supported environments)
 
     Data location can be a folder with .wavs, an individual .wav file,
     or a .txt file with file paths to .wavs, one per row. "
@@ -17,21 +17,21 @@ fi
 
 if [ $# -ge 3 ]; then
     echo "Too many arguments. Usage:
-    sh run_ALICE.sh <data_locationr>
+    ./run_ALICE.sh <data_location>
     or
-    sh run_ALICE.sh <data_location> --gpu (for GPU-supported environments)
+    ./run_ALICE.sh <data_location> gpu (for GPU-supported environments)
 
     Data location can be a folder  with .wavs, an individual .wav file,
     or a .txt file with file paths to .wavs, one per row. "
     exit 2
 fi
 
-cp $THISDIR/apply_overwrite.sh $THISDIR/voice-type-classifier/apply.sh
-
 DATADIR=$1
 
 if [ $# -ge 2 ]; then
-    GPU=$2;
+    GPU=$(echo "$2" | tr '[:upper:]' '[:lower:]') # force lowercase
+else
+    GPU="cpu"
 fi;
 
 rm -rf $THISDIR/tmp_data/
@@ -40,22 +40,21 @@ mkdir -p $THISDIR/tmp_data/
 mkdir -p $THISDIR/tmp_data/short/
 mkdir -p $THISDIR/tmp_data/features/
 
-# Run SAD on the files
-python3 prepare_data.py $THISDIR $DATADIR/
+# Copy wavs-to-be-processed to local folder
+python3 prepare_data.py $THISDIR $DATADIR
 
 # Call voice-type-classifier to do broad-class diarization
 
 rm -rf $THISDIR/output_voice-type-classifier/
-bash $THISDIR/voice-type-classifier/apply.sh $THISDIR/tmp_data/ "MAL FEM" $GPU
+bash $THISDIR/voice-type-classifier/apply.sh $THISDIR/tmp_data/ "MAL FEM" --device=$GPU 2>&1 | sed '/^Took/d'
+#bash $THISDIR/voice-type-classifier/apply.sh $THISDIR/tmp_data/ "MAL FEM" $GPU #|& sed '/^Took/d' # old pyannote syntax
 
 # Read .rttm files and split into utterance-sized wavs
 python3 split_to_utterances.py $THISDIR
-#rm $THISDIR/tmp_data/*.wav
 
 
 # Extract SylNet syllable counts
 if [ -z "$(ls -A $THISDIR/tmp_data/short/)" ]; then
-#if [ ${#files[@]} -gt 0 ]; then
   touch $THISDIR/tmp_data/features/ALUCs_out_individual.txt
   else
 
@@ -81,10 +80,9 @@ if [ -z "$(ls -A $THISDIR/tmp_data/short/)" ]; then
 fi
 
 
-
-#fi
-
 python3 getFinalEstimates.py $THISDIR $THISDIR/tmp_data/
+
+cp $THISDIR/tmp_data/features/ALUCs_out_individual.txt $THISDIR/ALICE_output_utterances.txt
 
 # Cleanup
 rm -rf $THISDIR/tmp_data/
