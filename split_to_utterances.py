@@ -9,7 +9,8 @@ import librosa
 
 curdir = sys.argv[1]
 
-valid_speakers = ['FEM','MAL']
+#valid_speakers = ['FEM','MAL']
+valid_speakers = ['FEM','MAL','CHI','KCHI']
 
 DATA = []
 with open(curdir + '/output_voice_type_classifier/tmp_data/all.rttm') as csv_file:
