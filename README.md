@@ -1,8 +1,16 @@
 # Automatic LInguistic Unit Count Estimator (ALICE)
 
+new_diarizer
 ![Architecture of our model](docs/ALICE.png)
 
 ### Introduction
+=======
+NOTE: This branch contains an outdated version of ALICE. Please use the new default branch "new_diarizer" for up-to-date performance. Note that the new branch requires installation from scratch. 
+
+
+INTRODUCTION
+-------------------
+>> master
 
 ALICE is a tool for estimating the number of adult-spoken linguistic units from child-centered audio
 recordings, as captured by microphones worn by children. It is meant as an open-source alternative
